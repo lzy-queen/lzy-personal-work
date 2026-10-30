@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>刘智勇 · 作品档案</title>
+<link rel="preload" as="image" href="img/01-img.jpg">
 <meta name="description" content="刘智勇 · 作品档案｜TikTok Shop 美区内容与数据选品作品集：3D 光盘档案、作品介绍与 TT-Pulse BI 数据看板。">
 <meta name="author" content="刘智勇">
 <meta name="theme-color" content="#F7F6F2">
@@ -1196,7 +1197,21 @@ body.mode-data #stage{visibility:hidden}
       'document.addEventListener("keydown",function(e){if(e.key==="ArrowRight")send(1);if(e.key==="ArrowLeft")send(-1);});' +
       '})();</scr' + 'ipt>';
     function inject(h) { var s = String(h || ''), i = s.toLowerCase().lastIndexOf('</body>'); return i > 0 ? s.slice(0, i) + SWIPE + s.slice(i) : s + SWIPE; }
-    function apply(html) { if (html) { frame.removeAttribute('src'); frame.srcdoc = inject(html); } }
+    /* 看板要等第一次点开「数据版」才装配：它的 Tailwind + Chart.js 加起来约 650KB，
+       以前一进作品页就把这份东西解析一遍，白白拖慢首屏。 */
+    var mounted = false;
+    function mount() {
+      if (mounted || !window.__lzyDashHTML) return;
+      mounted = true;
+      frame.removeAttribute('src');
+      frame.srcdoc = inject(window.__lzyDashHTML);
+    }
+    window.__lzyMountDash = mount;
+    function apply(html) {
+      if (!html) return;
+      window.__lzyDashHTML = html;
+      if (document.body.classList.contains('mode-data')) mount();
+    }
     if (location.protocol === 'file:') { apply(embedded()); return; }
     fetch('tiktok_bi_dashboard.html')
       .then(function (r) { return r.ok ? r.text() : null; })
@@ -2379,7 +2394,7 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
     if (nav) nav.className = 'top-nav ' + (isData ? 'theme-dark' : 'theme-light');
     document.getElementById('nav-works').classList.toggle('active', !isData);
     document.getElementById('nav-data').classList.toggle('active', isData);
-    if (isData) { renderBiCharts(); renderBiTable(); renderDataChrome(); hydrate(dataCur); }
+    if (isData) { renderBiCharts(); renderBiTable(); renderDataChrome(); hydrate(dataCur); if (window.__lzyMountDash) window.__lzyMountDash(); }
     try {
       if (isData) { if (location.hash !== '#data') history.replaceState(null, '', '#data'); }
       else if (location.hash) history.replaceState(null, '', location.pathname + location.search);
@@ -3510,7 +3525,8 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
         '<div class="row"><dt>YEAR / 年份</dt><dd>' + (it.year || '') + '</dd></div>' +
         '<div class="row"><dt>INTRODUCTION</dt><dd>' + String(it.desc || '待补充').replace(/\n/g, '<br>') + '</dd></div>';
       var zoom = it.work || it.img;
-      if (zoom) { var w2 = window.open('', '_blank'); if (w2) w2.document.write('<title>' + (it.title || '') + '</title><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + zoom + '" style="max-width:100%;max-height:100vh">'); }
+      if (zoom) { var w2 = window.open('', '_blank'); if (w2) w2.document.write('<title>' + (it.title || '') + '</title>
+<link rel="preload" as="image" href="img/01-img.jpg"><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + zoom + '" style="max-width:100%;max-height:100vh">'); }
     });
   }
   // fb-mode 只在真正降级时加，见 fallback()
