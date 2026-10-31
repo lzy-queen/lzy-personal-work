@@ -2834,6 +2834,21 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
   var dataPages = [];
   try { dataPages = JSON.parse(localStorage.getItem(DP_KEY) || '[]') || []; } catch (e) { dataPages = []; }
   if (Object.prototype.toString.call(dataPages) !== '[object Array]') dataPages = [];
+  /* 站点里内置的数据版页面：本机浏览器里上传过的页，抓出来烘焙成 data/ 下的静态文件，
+     这样换电脑 / 换手机打开网址也能看到，而不是只剩本机那台才有。
+     本机 localStorage 已经有页面清单时不覆盖；用户删空之后也不再自动塞回来。 */
+  var SEEDPAGES = [
+    { id: 'pmvte6wj9i7d8', name: 'tiktok_bi_dashboard', kind: 'html', size: 37252, file: 'data/pmvte6wj9i7d8.html' },
+    { id: 'pmvugziufzji3', name: '选品数据', kind: 'html', size: 19905, file: 'data/pmvugziufzji3.html' }
+  ];
+  var DP_SEEDED = 'lzy-dp-seeded';
+  try {
+    if (!dataPages.length && SEEDPAGES.length && localStorage.getItem(DP_SEEDED) !== '0') {
+      dataPages = SEEDPAGES.map(function (p) {
+        return { id: p.id, name: p.name, kind: p.kind, size: p.size || 0, file: p.file };
+      });
+    }
+  } catch (e) {}
   var dataCur = 0, hintShown = false, pageUrls = {};
   /* 内置的「看板」这一页也可以收起来（用户要求页面能删能加） */
   var BOARD_KEY = 'lzy-dp-board-hidden';
@@ -2883,7 +2898,11 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
   }
 
   function saveDataPages() {
-    try { localStorage.setItem(DP_KEY, JSON.stringify(dataPages)); } catch (e) { dpStatus('⚠️ 本机存储写不进去，页面清单可能存不住', '#D97706'); }
+    try {
+      localStorage.setItem(DP_KEY, JSON.stringify(dataPages));
+      /* 用户自己动过清单（增/删/改名）之后，就不再自动塞回内置页 */
+      localStorage.setItem(DP_SEEDED, '0');
+    } catch (e) { dpStatus('⚠️ 本机存储写不进去，页面清单可能存不住', '#D97706'); }
   }
   function dpStatus(txt, color) {
     var s = document.getElementById('dpStatus');
@@ -3025,6 +3044,7 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
     if (!box || box.getAttribute('data-ready')) return;
     box.setAttribute('data-ready', 'loading');
     getMedia('pg-' + p.id).then(function (blob) {
+      if (!blob && p.file) { loadPageFile(box, p); return; }
       if (!blob) {
         box.setAttribute('data-ready', '1');
         plainMsg(box, p.name, '这个文件不在当前这台设备的浏览器里。<br>数据版页面存在本机浏览器（IndexedDB），换电脑 / 换手机要重新上传一次。');
@@ -3034,6 +3054,35 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
       if (p.kind === 'docx') { renderDocxPage(box, p, blob); return; }
       readBlobText(blob, function (txt) { renderHtmlPage(box, p, txt); });
     });
+  }
+  /* 本机没有这份文件、但页面带 file（站点内置页）时，直接从站点上取 */
+  function loadPageFile(box, p) {
+    function fail() {
+      box.setAttribute('data-ready', '1');
+      plainMsg(box, p.name, '这个页面文件没加载出来，检查一下网络。', p.file, '直接打开');
+    }
+    if (p.kind === 'pdf') {
+      box.innerHTML = '';
+      var fr = document.createElement('iframe');
+      fr.setAttribute('title', p.name || 'PDF');
+      fr.setAttribute('frameborder', '0');
+      fr.src = p.file;
+      box.appendChild(fr);
+      box.setAttribute('data-ready', '1');
+      return;
+    }
+    if (p.kind === 'docx') {
+      fetch(p.file).then(function (r) { return r.blob(); }).then(function (blob) {
+        convertDocx(blob, function (err, html) {
+          if (err || !html) { fail(); return; }
+          mountDocHtml(box, p, html);
+        });
+      }).catch(fail);
+      return;
+    }
+    fetch(p.file).then(function (r) { return r.text(); }).then(function (txt) {
+      renderHtmlPage(box, p, txt);
+    }).catch(fail);
   }
   function renderHtmlPage(box, p, txt) {
     box.innerHTML = '';

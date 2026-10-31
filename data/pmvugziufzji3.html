@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TikTok Shop 美区 · 选品竞品 BI 看板</title>
+<style>
+:root{
+  --bg:#08090A; --card:#101216; --line:#1F232B; --txt:#E6E7EA; --dim:#8A8F98;
+  --indigo:#5E6AD2; --sky:#4EA7FC; --violet:#B59AFF; --up:#3DD68C; --down:#F0616D; --amber:#F5C842;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI','Microsoft YaHei',system-ui,sans-serif;font-size:15px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+aside{border-right:1px solid var(--line);padding:28px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+.logo{font-weight:700;font-size:16px;letter-spacing:.3px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.logo i{width:10px;height:10px;border-radius:3px;background:linear-gradient(120deg,var(--indigo),var(--violet));display:inline-block}
+.nav a{display:block;padding:8px 10px;border-radius:8px;color:var(--dim);font-size:14px}
+.nav a:hover,.nav a.on{color:var(--txt);background:#14161B}
+.foot{margin-top:auto;color:#9aa0ac;font-size:13px;line-height:1.7}
+main{padding:28px 34px 60px;max-width:1240px}
+h1{font-size:26px;font-weight:700;letter-spacing:.2px}
+.sub{color:var(--dim);font-size:14px;margin:6px 0 22px}
+.sub b{color:var(--txt)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+.card:hover{border-color:#33394A;transform:translateY(-1px)}
+.card::before{content:"";position:absolute;inset:0;border-radius:14px;padding:1px;background:linear-gradient(130deg,rgba(94,106,210,.0),rgba(94,106,210,.0));pointer-events:none;transition:background .3s}
+.card:hover::before{background:linear-gradient(130deg,rgba(94,106,210,.55),rgba(78,167,252,.25),rgba(181,154,255,.55));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.k .lab{color:var(--dim);font-size:13px}
+.k .val{font-size:30px;font-weight:700;margin:2px 0;letter-spacing:.3px}
+.k .dlt{font-size:14px}
+.up{color:var(--up)}.down{color:var(--down)}
+.span2{grid-column:span 2}.span4{grid-column:span 4}
+h2{font-size:17px;font-weight:700;margin-bottom:4px}
+.h2d{color:var(--dim);font-size:14px;margin-bottom:12px}
+.seg{display:inline-flex;background:#14161B;border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px;margin-bottom:12px;flex-wrap:wrap}
+.seg button{background:none;border:0;color:var(--dim);font-size:13px;padding:6px 13px;border-radius:7px;cursor:pointer;font-family:inherit}
+.seg button.on{background:linear-gradient(120deg,var(--indigo),#7a63d8);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{color:var(--dim);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--txt)}
+td{padding:9px 10px;border-bottom:1px solid #14161B;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:#14161B}
+.pn{font-weight:600}
+.br{color:var(--dim);font-size:13px}
+.chip{display:inline-block;font-size:12.5px;padding:1px 8px;border-radius:20px;border:1px solid var(--line);color:var(--dim)}
+.chip.hot{border-color:rgba(245,200,66,.4);color:var(--amber)}
+.chip.new{border-color:rgba(78,167,252,.4);color:var(--sky)}
+svg text{font-family:inherit}
+.tip{position:fixed;z-index:99;background:#1A1D24;border:1px solid #33394A;border-radius:10px;padding:10px 12px;font-size:13px;pointer-events:none;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:260px}
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.fld{margin-bottom:12px}
+.fld label{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-bottom:4px}
+.fld label b{color:var(--txt);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--indigo);height:28px}
+.out{background:#14161B;border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+.out .row{display:flex;justify-content:space-between;font-size:14px;color:var(--dim)}
+.out .row b{color:var(--txt);font-size:16px;font-variant-numeric:tabular-nums}
+.out .big{font-size:34px;font-weight:700;color:#fff}
+.ins{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ins .card{font-size:14px}
+.ins .t{font-weight:700;margin-bottom:6px;display:flex;gap:8px;align-items:center}
+.ins .t i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.src{color:var(--dim);font-size:14px;line-height:1.8}
+.src b{color:var(--txt)}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}.span4{grid-column:span 2}.ins{grid-template-columns:1fr}.calc{grid-template-columns:1fr}}
+@media(max-width:860px){.layout{grid-template-columns:1fr}aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;border-right:0;border-bottom:1px solid var(--line)}.foot{display:none}main{padding:18px}.grid{grid-template-columns:1fr 1fr}.span2,.span4{grid-column:span 2}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="logo"><i></i>TTK·BI 看板</div>
+  <nav class="nav">
+    <a href="#top" class="on">市场总览</a>
+    <a href="#board">竞品榜单</a>
+    <a href="#map">价格 × 增速</a>
+    <a href="#comm">佣金带</a>
+    <a href="#calc">净利模型</a>
+    <a href="#ins">规律洞察</a>
+    <a href="#src">数据口径</a>
+  </nav>
+  <div class="foot">数据快照 2026-10-27<br>来源 FastMoss 公开榜单<br>刘智勇 · 作品集交互 BI 项目</div>
+</aside>
+<main id="top">
+  <h1>TikTok Shop 美区 · 选品竞品分析</h1>
+  <p class="sub">大盘月度 <b>GMV $2.41B</b> · 销量 <b>85.7M 件</b> · YoY <b class="up">+89.8%</b> —— 数据源 FastMoss（2026-09 统计 / 10-27 周榜快照）</p>
+
+  <div class="grid">
+    <div class="card k"><div class="lab">美区月 GMV（2026-09）</div><div class="val">$2.41<span style="font-size:16px;color:var(--dim)">B</span></div><div class="dlt up">▲ YoY +89.8%</div></div>
+    <div class="card k"><div class="lab">月销量</div><div class="val">85.7<span style="font-size:16px;color:var(--dim)">M 件</span></div><div class="dlt" style="color:var(--dim)">全网带货件数</div></div>
+    <div class="card k"><div class="lab">客单价 ASP</div><div class="val">$28.16</div><div class="dlt" style="color:var(--dim)">甜蜜点 $20–50</div></div>
+    <div class="card k"><div class="lab">榜首周销（10-27）</div><div class="val">2.14<span style="font-size:16px;color:var(--dim)">万件</span></div><div class="dlt up">KKPeople 塑身衣 +9.6%</div></div>
+
+    <div class="card span4" id="board">
+      <h2>竞品榜单 · 可排序 / 可筛选</h2>
+      <p class="h2d">周榜 Top 商品 + 10 月新品榜 + 黑五 2025 参照系；「—」为公开榜单未披露字段，不做估算。</p>
+      <div class="seg" id="seg">
+        <button class="on" data-f="all">全部 12</button>
+        <button data-f="女装内衣">女装内衣 7</button>
+        <button data-f="电子">电子 2</button>
+        <button data-f="新品榜">10月新品 3</button>
+        <button data-f="BF参照">黑五参照 2</button>
+      </div>
+      <div style="overflow-x:auto">
+      <table id="tbl">
+        <thead><tr>
+          <th data-c="0">商品</th><th data-c="1">品类</th><th data-c="2" style="text-align:right">价格带 $</th>
+          <th data-c="3" style="text-align:right">周销量</th><th data-c="4" style="text-align:right">周环比</th>
+          <th data-c="5" style="text-align:right">累计 GMV</th><th data-c="6" style="text-align:right">佣金率</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="card span2" id="map">
+      <h2>价格 × 周环比增速 分布</h2>
+      <p class="h2d">横轴=售价中值（对数感排布），纵轴=周环比增速；气泡大小=累计 GMV（无累计值者小点）。悬停查看。</p>
+      <svg id="scatter" viewBox="0 0 560 320" style="width:100%"></svg>
+    </div>
+
+    <div class="card span2" id="comm">
+      <h2>佣金带 × 价格带</h2>
+      <p class="h2d">已披露佣金率的样本：低价品 15% 上下即可跑量；$25 以上需 20–25% 佣金才有达人推力（Toplux 黑五 $29.97 / 25% 为证）。</p>
+      <svg id="commbar" viewBox="0 0 560 320" style="width:100%"></svg>
+    </div>
+
+    <div class="card span4" id="calc">
+      <h2>净利模型计算器</h2>
+      <p class="h2d">达人分销模式下单件净利：扣平台费（美区类目佣金约 8%）、达人佣金、头程物流与退货损耗。拖动即算。</p>
+      <div class="calc">
+        <div>
+          <div class="fld"><label>售价 <b id="v1">$24.99</b></label><input type="range" id="p" min="9.9" max="49.9" step="1" value="24.99"></div>
+          <div class="fld"><label>1688 拿货成本 <b id="v2">¥28</b></label><input type="range" id="c1" min="5" max="80" step="1" value="28"></div>
+          <div class="fld"><label>头程物流 / 件 <b id="v3">¥18</b></label><input type="range" id="c2" min="3" max="60" step="1" value="18"></div>
+          <div class="fld"><label>达人佣金率 <b id="v4">20%</b></label><input type="range" id="r" min="5" max="35" step="1" value="20"></div>
+          <div class="fld"><label>退货/损耗计提 <b id="v5">5%</b></label><input type="range" id="rt" min="0" max="20" step="1" value="5"></div>
+        </div>
+        <div class="out">
+          <div class="row"><span>单件净利（汇率 7.1）</span><b class="big" id="o1">—</b></div>
+          <div class="row"><span>净利率</span><b id="o2">—</b></div>
+          <div class="row"><span>保本佣金率（净利=0）</span><b id="o3">—</b></div>
+          <div class="row"><span>平台费按 8% 计提 · 不含广告投流</span><b></b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="span4 ins" id="ins">
+      <div class="card"><div class="t"><i style="background:var(--sky)"></i>加绒裤袜 = 冬季确定性主升浪</div>周榜同品类 4 条链接全部上涨（+82.1% / +43.2% / +38.3% / +46.7%），是「品类需求」而非单品运气；$12–33 价格带全段有成交。</div>
+      <div class="card"><div class="t"><i style="background:var(--amber)"></i>$20–50 演示型商品甜蜜点</div>ASP $28.16 的市场里，可视化演示（上身/开箱/效果对比）商品转化最好；塑身衣周销 2.14 万件居首即此逻辑。</div>
+      <div class="card"><div class="t"><i style="background:var(--down)"></i>两个避坑信号</div>珠宝/收藏品为直播驱动型，短视频分销难复制；OEAK Jelly Bra 周环比 −12.5% 显示网红单品进入退潮期，跟卖要错峰。</div>
+    </div>
+
+    <div class="card span4 src" id="src">
+      <b>数据口径与诚实声明</b>：大盘四项为 FastMoss《US TikTok Shop Statistics (September 2026)》公开口径；竞品为 2026-10-27 美区「女装与女士内衣」「消费电子」周榜快照与 10 月新品日榜；黑五参照取自 FastMoss BF25 复盘。周销量/累计 GMV 留「—」处为榜单未披露，未做任何推算。场域（短视频/直播/商品卡）成交占比无公开精确拆分，本看板不呈现估算值，仅在洞察中给定性结论。净利模型参数为行业常用假设，实际以店铺后台为准。
+    </div>
+  </div>
+</main>
+</div>
+<div class="tip" id="tip"></div>
+<script>
+const D=[
+ {n:'KKPeople 塑身连体衣',b:'KKPeople',cat:'女装内衣',pl:'24.9–42.8',pm:33.85,wk:21400,g:9.6,acc:4.31,comm:15},
+ {n:'OEAK Jelly Bra',b:'OEAK',cat:'女装内衣',pl:'17–20',pm:18.5,wk:19700,g:-12.5,acc:19.51,comm:null},
+ {n:'OEAK 加绒裤袜',b:'OEAK',cat:'女装内衣',pl:'12–17',pm:14.5,wk:19000,g:82.1,acc:2.52,comm:null},
+ {n:'SWEET MAYHEM 加绒裤袜',b:'SWEET MAYHEM',cat:'女装内衣',pl:'14–24',pm:19,wk:null,g:43.2,acc:17.05,comm:null},
+ {n:'SHAPELLX 加绒裤袜',b:'SHAPELLX',cat:'女装内衣',pl:'33',pm:33,wk:null,g:38.3,acc:null,comm:null},
+ {n:'豹纹阔腿裤',b:'—',cat:'女装内衣',pl:'16.8',pm:16.8,wk:null,g:534.7,acc:null,comm:null},
+ {n:'OUFALI 加绒裤袜',b:'OUFALI',cat:'女装内衣',pl:'—',pm:null,wk:null,g:46.7,acc:null,comm:null},
+ {n:'R36S 复古掌机',b:'—',cat:'电子',pl:'53.8',pm:53.8,wk:7200,g:20.7,acc:6.85,comm:null},
+ {n:'0816yes 电子配件',b:'0816yes',cat:'电子',pl:'12.8',pm:12.8,wk:null,g:365,acc:null,comm:null},
+ {n:'NeeDoh Squishmas 倒数日历',b:'NeeDoh',cat:'新品榜',pl:'≈40',pm:40,wk:6313,g:null,acc:.252,comm:null,new:true},
+ {n:'老人脸巴拉克拉法帽',b:'—',cat:'新品榜',pl:'≈12.2',pm:12.2,wk:5752,g:null,acc:.0699,comm:null,new:true},
+ {n:'WANSE 穿戴甲',b:'WANSE',cat:'新品榜',pl:'≈87',pm:87,wk:5113,g:null,acc:.4447,comm:null,new:true},
+];
+const BF=[
+ {n:'Loaded Tea（BF25）',b:'Loaded',cat:'BF参照',pl:'3.5',pm:3.5,wk:263000,g:null,acc:null,comm:null,bf:true},
+ {n:'Toplux 镁片（BF25）',b:'Toplux',cat:'BF参照',pl:'29.97',pm:29.97,wk:null,g:null,acc:6.10,comm:25,bf:true},
+];
+const ALL=[...D,...BF];
+const fmtW=v=>v==null?'—':(v>=10000?(v/10000).toFixed(1)+'万':v.toLocaleString());
+const fmtG=v=>v==null?'—':'$'+v.toFixed(2)+'M';
+const fmtPct=v=>v==null?'—':(v>0?'<span class="up">+'+v+'%</span>':'<span class="down">'+v+'%</span>');
+let filt='all',sortC=-1,sortAsc=true;
+function rows(){
+  let r=ALL.filter(d=>filt=='all'?true:d.cat==filt);
+  if(sortC>=0){const key=['n','cat','pm','wk','g','acc','comm'][sortC];r=[...r].sort((a,b)=>{let x=a[key],y=b[key];if(x==null)return 1;if(y==null)return -1;if(typeof x=='string')return sortAsc?x.localeCompare(y):y.localeCompare(x);return sortAsc?x-y:y-x});}
+  return r;
+}
+function draw(){
+  document.querySelector('#tbl tbody').innerHTML=rows().map(d=>
+    `<tr><td><span class="pn">${d.n}</span><br><span class="br">${d.b}</span></td>
+     <td><span class="chip ${d.new?'new':d.bf?'hot':''}">${d.cat}</span></td>
+     <td style="text-align:right">${d.pl}</td><td style="text-align:right">${fmtW(d.wk)}</td>
+     <td style="text-align:right">${fmtPct(d.g)}</td><td style="text-align:right">${fmtG(d.acc)}</td>
+     <td style="text-align:right">${d.comm==null?'—':d.comm+'%'}</td></tr>`).join('');
+}
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');filt=b.dataset.f;draw();});
+document.querySelectorAll('#tbl th').forEach(t=>t.onclick=()=>{
+  const c=+t.dataset.c;if(sortC==c)sortAsc=!sortAsc;else{sortC=c;sortAsc=true;}draw();});
+draw();
+/* scatter */
+(function(){
+  const s=document.getElementById('scatter'),tip=document.getElementById('tip');
+  const W=560,H=320,L=46,R=14,T=14,B=40;
+  const pts=ALL.filter(d=>d.pm!=null&&(d.g!=null||d.cat=='新品榜'));
+  const x=v=>L+(Math.log10(v)-Math.log10(3))/(Math.log10(90)-Math.log10(3))*(W-L-R);
+  const y=v=>H-B-(v+20)/(560)*(H-T-B);
+  let svg=`<line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="#2A2E37"/><line x1="${L}" y1="${T}" x2="${L}" y2="${H-B}" stroke="#2A2E37"/>`;
+  [0,100,200,300,400,500].forEach(v=>{svg+=`<text x="${L-6}" y="${y(v)+4}" fill="#8b91a0" font-size="14" text-anchor="end">${v}%</text><line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#14161B"/>`});
+  [5,10,20,50].forEach(v=>svg+=`<text x="${x(v)}" y="${H-B+16}" fill="#8b91a0" font-size="14" text-anchor="middle">$${v}</text>`);
+  svg+=`<text x="${W/2}" y="${H-6}" fill="#9aa0ac" font-size="15" text-anchor="middle">售价中值（对数轴）· 纵轴=周环比增速 · 新品榜列于 0% 基线</text>`;
+  pts.forEach(d=>{
+    const r=d.acc?Math.max(5,Math.sqrt(d.acc)*3.2):5;
+    const col=d.cat=='电子'?'var(--violet)':d.cat=='新品榜'?'var(--sky)':d.g>50?'var(--amber)':'var(--indigo)';
+    svg+=`<circle cx="${x(d.pm)}" cy="${y(d.g==null?0:d.g)}" r="${r}" fill="${col}" fill-opacity=".28" stroke="${col}" stroke-width="1.5" data-n="${d.n}" data-i="${d.pl} · 周环比 ${d.g==null?'—':d.g+'%'} · 累计 ${fmtG(d.acc)}"></circle>`;});
+  s.innerHTML=svg;
+  s.addEventListener('mousemove',e=>{const t=e.target;if(t.tagName=='circle'){tip.style.display='block';tip.style.left=e.clientX+14+'px';tip.style.top=e.clientY+10+'px';tip.innerHTML=`<b>${t.dataset.n}</b><br>${t.dataset.i}`;}else tip.style.display='none';});
+  s.addEventListener('mouseleave',()=>tip.style.display='none');
+})();
+/* commission bars */
+(function(){
+  const s=document.getElementById('commbar');
+  const items=[{n:'KKPeople 塑身衣',p:33.85,c:15},{n:'Toplux 镁片 $29.97',p:29.97,c:25},{n:'市场建议带（>$25）',p:0,c:22.5,ref:true}];
+  const W=560,H=320,L=150,R=30,T=26;
+  const max=35,y=v=>T+(1-v/max)*(H-T-46);
+  let svg='';
+  [10,20,30].forEach(v=>svg+=`<text x="${L-8}" y="${y(v)+4}" fill="#8b91a0" font-size="14" text-anchor="end">${v}%</text><line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#14161B"/>`);
+  const bw=86;
+  items.forEach((it,i)=>{
+    const bx=L+24+i*((W-L-R-40)/3);
+    if(it.ref){svg+=`<rect x="${bx}" y="${y(it.c)}" width="${bw}" height="${H-46-y(it.c)}" fill="none" stroke="var(--amber)" stroke-dasharray="5 4" rx="6"/>`;
+      svg+=`<text x="${bx+bw/2}" y="${y(it.c)-8}" fill="var(--amber)" font-size="14" text-anchor="middle">20–25%</text>`;}
+    else{svg+=`<rect x="${bx}" y="${y(it.c)}" width="${bw}" height="${H-46-y(it.c)}" rx="6" fill="url(#g1)"/>
+      <text x="${bx+bw/2}" y="${y(it.c)-8}" fill="var(--txt)" font-size="14" text-anchor="middle">${it.c}%</text>`;}
+    svg+=`<text x="${bx+bw/2}" y="${H-28}" fill="#9aa0ac" font-size="14" text-anchor="middle">${it.n.split(' ')[0]}</text>
+          <text x="${bx+bw/2}" y="${H-13}" fill="#8b91a0" font-size="14" text-anchor="middle">${it.p?'$'+it.p:'高客单区间'}</text>`;});
+  svg=`<defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5E6AD2"/><stop offset="1" stop-color="#B59AFF"/></linearGradient></defs>`+svg;
+  svg+=`<text x="${W/2}" y="14" fill="#9aa0ac" font-size="14" text-anchor="middle">已披露佣金率样本 + 高客单建议带</text>`;
+  s.innerHTML=svg;
+})();
+/* calculator */
+(function(){
+  const $=id=>document.getElementById(id);
+  const fx=$('p'),c1=$('c1'),c2=$('c2'),r=$('r'),rt=$('rt');
+  function calc(){
+    const P=+fx.value,C1=+c1.value,C2=+c2.value,R=+r.value/100,RT=+rt.value/100,E=7.1;
+    $('v1').textContent='$'+P.toFixed(2);$('v2').textContent='¥'+C1;$('v3').textContent='¥'+C2;$('v4').textContent=r.value+'%';$('v5').textContent=rt.value+'%';
+    const netUSD=P*(1-.08-R-RT)-C1/E-C2/E;
+    const netRMB=netUSD*E;
+    $('o1').textContent=(netRMB>=0?'+':'')+'¥'+netRMB.toFixed(1);
+    $('o1').style.color=netRMB>=0?'var(--up)':'var(--down)';
+    $('o2').textContent=(netUSD/P*100).toFixed(1)+'%';
+    const be=(P*(1-.08-RT)-C1/E-C2/E)/P*100;
+    $('o3').textContent=(be>0?be.toFixed(1)+'%':'已低于成本');
+  }
+  [fx,c1,c2,r,rt].forEach(e=>e.oninput=calc);calc();
+})();
+/* nav highlight */
+const links=[...document.querySelectorAll('.nav a')];
+addEventListener('scroll',()=>{let cur=links[0];for(const a of links){const t=document.querySelector(a.getAttribute('href'));if(t&&t.getBoundingClientRect().top<160)cur=a;}links.forEach(a=>a.classList.toggle('on',a==cur));},{passive:true});
+</script>
+</body>
+</html>
