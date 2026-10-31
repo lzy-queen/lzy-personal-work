@@ -1517,6 +1517,12 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
       el.innerHTML = '<div class="tilt">' + discHTML(it, i) + '</div>';
       gallery.appendChild(el);
     });
+    /* 首屏只画中央那几张，剩下的等页面空下来再补（不挡首屏，也不会留白盘） */
+    if (window.__paintIdle) { clearTimeout(window.__paintIdle); }
+    window.__paintIdle = setTimeout(function () {
+      var all = $$('.cd');
+      for (var z = 0; z < all.length; z++) paintArt(all[z]);
+    }, 900);
     measure();
     place(true);
   }
