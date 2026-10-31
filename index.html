@@ -3080,9 +3080,15 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
       }).catch(fail);
       return;
     }
-    fetch(p.file).then(function (r) { return r.text(); }).then(function (txt) {
-      renderHtmlPage(box, p, txt);
-    }).catch(fail);
+    /* 站点内置页直接给 iframe 一个真实地址：srcdoc 下 Tailwind 那类靠脚本注入样式的
+       页面容易只出背景不出内容，用 URL 加载跟单独打开一模一样 */
+    box.innerHTML = '';
+    var hf = document.createElement('iframe');
+    hf.setAttribute('title', p.name || '数据版页面');
+    hf.setAttribute('frameborder', '0');
+    hf.src = p.file;
+    box.appendChild(hf);
+    box.setAttribute('data-ready', '1');
   }
   function renderHtmlPage(box, p, txt) {
     box.innerHTML = '';
