@@ -2842,7 +2842,10 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
   ];
   var DP_SEEDED = 'lzy-dp-seeded';
   try {
-    if (!dataPages.length && SEEDPAGES.length && localStorage.getItem(DP_SEEDED) !== '0') {
+    /* 用户没自己动过清单（没加/删过页）时，永远以当前内置清单为准 ——
+       这样内置页有增减，老访客刷新就能同步；一旦用户动过，就按他自己的来。 */
+    var userEdited = localStorage.getItem(DP_SEEDED) === '0';
+    if (!userEdited && SEEDPAGES.length) {
       dataPages = SEEDPAGES.map(function (p) {
         return { id: p.id, name: p.name, kind: p.kind, size: p.size || 0, file: p.file };
       });
