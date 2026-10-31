@@ -2922,10 +2922,10 @@ dd{margin:3px 0 0;font-size:12px;color:#b9c4d2;line-height:1.65}
     if (!boardHidden) {
       if (i === 0) return { board: true, id: '__board', name: '看板', kind: 'board' };
       var q = dataPages[i - 1];
-      return q ? { board: false, id: q.id, name: q.name || ('页面 ' + i), kind: q.kind } : null;
+      return q ? { board: false, id: q.id, name: q.name || ('页面 ' + i), kind: q.kind, file: q.file } : null;
     }
     var q2 = dataPages[i];
-    return q2 ? { board: false, id: q2.id, name: q2.name || ('页面 ' + (i + 1)), kind: q2.kind } : null;
+    return q2 ? { board: false, id: q2.id, name: q2.name || ('页面 ' + (i + 1)), kind: q2.kind, file: q2.file } : null;
   }
   function pageBox(i) {
     var p = pageAt(i);
